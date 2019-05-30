@@ -17,27 +17,27 @@ The program uses precise rational number arithmetic when it can, but resorts to 
 
 The program has at least the following modes:
 
-* Arithmetic:
-  * comparing chains of equalities and inequalities,
-  * basic operators and functions and their derivatives.
+### Arithmetic
+* comparing chains of equalities and inequalities,
+* basic operators and functions and their derivatives.
 
-* Tree comparison
-  * Expressing the structure of mathematical expressions
+### Tree comparison
+* Expressing the structure of mathematical expressions
 
-* Propositional logic
-  * Check a propositional chain of reasoning
-  * Can use 2- or 3-value logic, as per user desire
+### Propositional logic
+* Check a propositional chain of reasoning
+* Can use 2- or 3-value logic, as per user desire
 
-* Equation:
-  * Same as arithmetic mode, but reports the loss of _teacher given_ solutions (roots) to the student.
-  * Checks whether student given solutions satisfy the equation being observed.
-  * Cannot tell if extra roots have been given.
+### Equation
+* Same as arithmetic mode, but reports the loss of _teacher given_ solutions (roots) to the student.
+* Checks whether student given solutions satisfy the equation being observed.
+* Cannot tell if extra roots have been given.
 
-* Modulo
-  * To put it simply, checks for modulo arithmetic.
+### Modulo
+* To put it simply, checks for modulo arithmetic.
 
-* Array:
-  * Allows the analysis of claims concerning arrays or matrices.
+### Array
+* Allows the analysis of claims concerning arrays or matrices.
 
 
 ## MathCheck Authoring Tool Instructions
