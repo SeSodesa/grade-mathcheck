@@ -171,7 +171,7 @@ Integer expressions may also contain the following functions:
 
 * `select(i, v0, …, vn)`
 
-  * If $i$ is between $0$ and $n$ inclusive, select returns `vi`. If $i < 0$, select returns `v0`. If $i > n$, select returns `vn`. 
+  * If $`i`$ is between $`0`$ and $`n`$ inclusive, select returns `vi`. If $`i < 0`$, select returns `v0`. If $`i > n`$, select returns `vn`. 
 
   * The implementation is not protected against arithmetic overflows. This means that arithmetic is unsafe above roughly $`2 \times 109`$.
 
