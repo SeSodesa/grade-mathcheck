@@ -155,9 +155,9 @@ To get `#`, please write `##`. If the program removes a space or newline that yo
 
 Variables facilitate random values on problem pages and simplify writing identically repeating material. The names of integer variables are `a, …, z` and the names of string variables are `A, …, Z`. Their values are assigned with the `#let` command. A variable retains its value until assigned a new value, even if the problem page or file name base is changed in between.
 
-In string parameters, each `#<variable>` is replaced by the value of the variable. The value is surrounded by white space, to avoid accidental fusion of two tokens into one like in sin h → sinh. The value of an integer variable is also surrounded by ( and ), to ensure that the mathematical meaning is not affected by the environment. Other appearance may be obtained by first copying the value to a string variable.
+In string parameters, each `#<variable>` is replaced by the value of the variable. The value is surrounded by white space, to avoid accidental fusion of two tokens into one like in sin h → sinh. The value of an integer variable is also surrounded by `(` and `)`, to ensure that the mathematical meaning is not affected by the environment. Other appearance may be obtained by first copying the value to a string variable.
 
-Integer expressions may contain literals (non-empty sequences of digits), integer variables (without the # in front), parentheses ( and ), unary + and ‐, and binary +, ‐, *, /, and %. They have their familiar meanings (% is modulo). Unary operators have the highest precedence, then *, /, and %, and finally binary + and ‐. The binary operators associate to the left.
+Integer expressions may contain literals (non-empty sequences of digits), integer variables (without the `#` in front), parentheses `(` and `)`, unary `+` and `‐`, and binary `+`, `‐`, `*`, `/`, and `%`. They have their familiar meanings (% is modulo). Unary operators have the highest precedence, then `*`, `/`, and `%`, and finally binary `+` and `‐`. The binary operators associate to the left.
 
 Integer expressions may also contain the following functions:
 
@@ -167,13 +167,13 @@ Integer expressions may also contain the following functions:
 
 * `random(n)`
 
-  * Returns a random value between $0$ and $n-1$. 
+  * Returns a random value between $`0`$ and $`n-1`$. 
 
 * `select(i, v0, …, vn)`
 
   * If $i$ is between $0$ and $n$ inclusive, select returns `vi`. If $i < 0$, select returns `v0`. If $i > n$, select returns `vn`. 
 
-  * The implementation is not protected against arithmetic overflows. This means that arithmetic is unsafe above roughly $2 \times 109$.
+  * The implementation is not protected against arithmetic overflows. This means that arithmetic is unsafe above roughly $`2 \times 109`$.
 
   * A string expression consists of one or more string atoms separated by `+`. A string atom is either a string literal, an integer or string variable (without the `#` in front), or any of the following functions. The value of an integer variable is surrounded by `(` and `)`.
 
@@ -181,15 +181,15 @@ Integer expressions may also contain the following functions:
 
 * (`Pterm(n,T)` | `pterm(n,T)`)
 
-  * These return $`nT`$ formatted as a summand. If $`n = 0`$, these return the empty string. If $n = 1$, `Pterm` returns $+T$ and pterm returns $T$. If $n = –1$, these return $-T$. If $n > 1$, `Pterm` returns $+n T$ and `pterm` returns $n T$. If $n < –1$, these return $n T$ (where $n$ yields the minus sign). 
+  * These return $`nT`$ formatted as a summand. If $`n = 0`$, these return the empty string. If $n = 1$, `Pterm` returns $`+T`$ and pterm returns $`T`$. If $`n = –1`$, these return $`-T`$. If $`n > 1`$, `Pterm` returns $+n T$ and `pterm` returns $`n T`$. If $`n < –1`$, these return $`n T`$ (where $`n`$ yields the minus sign). 
 
 * `Pz(n)`
 
-  * Returns n formatted as a summand. If n = 0, returns the empty string. If n > 0, returns +n. If n < 0, returns n (including the minus sign). 
+  * Returns n formatted as a summand. If $`n = 0`$, returns the empty string. If $`n > 0`$, returns $`+n`$. If $`n < 0`$, returns $`n`$ (including the minus sign). 
 
 * `pZ(n)`
 
-  * Returns n in the usual format. That is, the sign is printed only if it is –, and the value is printed even if it is 0. 
+  * Returns `n` in the usual format. That is, the sign is printed only if it is `-`, and the value is printed even if it is `0`. 
 
 * `select(i, V0, …, Vn)`
 
