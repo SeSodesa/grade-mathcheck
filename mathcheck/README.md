@@ -48,7 +48,7 @@ Version 2018-07-18, copied from http://math.tut.fi/mathcheck/cgi-bin/make_proble
 
 This program inputs MathCheck problem descriptions and produces the corresponding HTML problem pages. It has two modes, a web mode and batch mode. If you do not know which mode you are using, then you are using the web mode and can ignore the instructions on the batch mode.
 
-A problem description consists of a sequence of commands of the form `#<command_name> <parameters>`. The most important commands are `#title`, `#question`, and `#hidden`. They specify the title of the problem page, the question(s) on the page, and the hidden information that MathCheck uses when checking the solution. In the batch mode, also #filename is important.
+A problem description consists of a sequence of commands of the form `#<command_name> <parameters>`. The most important commands are `#title`, `#question`, and `#hidden`. They specify the title of the problem page, the question(s) on the page, and the hidden information that MathCheck uses when checking the solution. In the batch mode, also `#filename` is important.
 
 String Parameters contain text that will be shown to the student (perhaps after some processing), are intended for MathCheck, or both. MathCheck strings are string parameters that are intended for MathCheck. Although a lot of effort was made to make their use as simple and safe as possible, some tricky issues cannot be avoided. Therefore, please at least skim through these two sections. Variables allow (perhaps randomized) parameters in the problem pages. You can safely ignore that section, if you want.
 
