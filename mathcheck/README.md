@@ -7,13 +7,13 @@ A tool for checking math solutions in detail.
 
 MathCheck was originally designed to help students learn elementary university mathematics. The program made this possible by giving students immediate feedback on their solutions, a solution being the entire chain of reasoning given to the program by the student.
 
-# MathCheck under the surface
+## MathCheck under the surface
 
 MathCheck works by assigning many combinations of values to a set of variables given as a part of a problem and trying to find a counterexample to a given claim. A claim could be a chain of equalities, inequalities or logical equivalences between two or more logical [predicates](https://en.wikipedia.org/wiki/Predicate_%28mathematical_logic%29) $`P : X \to \{\mathrm T,\mathrm F,\mathrm U\}`$, where $`\lnot \mathrm T = \mathrm F`$, $`\lnot \mathrm F = \mathrm T`$ and $`\lnot \mathrm U = \mathrm U`$. MathCheck also includes a lightweight proof engine.
 
 The program uses precise rational number arithmetic when it can, but resorts to floating point [interval arithmetic](https://en.wikipedia.org/wiki/Interval_arithmetic) when this is not possible. Rounding errors should therefore not cause any false alarms, but true alarms could be lost.
 
-# Capabilities
+## Capabilities
 
 The program has at least the following modes:
 
