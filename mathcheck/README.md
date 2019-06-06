@@ -2,6 +2,7 @@
 # MathCheck
 
 A tool for checking math solutions in detail.
+Developed by [Antti Valmari](http://users.jyu.fi/%7eava/indexEng.html).
 
 ## Motivation
 
