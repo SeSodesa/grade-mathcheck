@@ -15,7 +15,11 @@ COPY mathcheck/ /usr/local/bin/mathcheck
 ARG MATHCHECK_SOURCE=/usr/local/bin/mathcheck/mathcheck.cc
 ARG MATHCHECK_BIN=/usr/local/bin/mathcheck.out
 
+<<<<<<< HEAD
 # Install g++ for compiling MathCheck
+=======
+# Install g++ dor compiling MathCheck
+>>>>>>> 766adf4daa38f36755600f0665febfc65f05a026
 RUN  apt update \
   && apt install -y g++ \
   && g++ -static \
