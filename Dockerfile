@@ -23,4 +23,4 @@ RUN  apt update \
 
 
 # Run MathCheck
-ENTRYPOINT [ "mathcheck.out" ]
+# ENTRYPOINT [ "mathcheck.out" ]
