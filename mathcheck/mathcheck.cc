@@ -1,7 +1,7 @@
 #define confuse
 #define record
 #include "input_output.cc"
-copyright mathcheck_cc( "mathcheck.cc", "Antti Valmari", 20190422 );
+copyright mathcheck_cc( "mathcheck.cc", "Antti Valmari", 20190713 );
 /*
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -356,7 +356,7 @@ const char *tkn_str[] = {
   "mathcheck", "mod", "modulo", "mu",
   "next_URL", "no_next_URL", "not", "nu",
   "ok_text", "om", "only_no_yes_off", "only_no_yes_on", "or", "original",
-  "parse_tree", "ph", "pi", "prop3_off", "prop3_on", "prop_logic",
+  "parse_tree", "ph", "pi", "prime", "prop3_off", "prop3_on", "prop_logic",
   "prove_off", "prove_on", "ps",
   "real", "reset", "rh", "root",
   "si", "sin", "sinh", "skip_error", "solve", "sqrt", "sum",
@@ -429,8 +429,8 @@ enum tkn_type {
   tkn_next_URL, tkn_no_next_URL, tkn_not, tkn_nu,
   tkn_ok_text, tkn_om, tkn_only_no_yes_off, tkn_only_no_yes_on, tkn_or,
   tkn_original,
-  tkn_parse, tkn_ph, tkn_pi, tkn_prop3_off, tkn_prop3_on, tkn_prop_logic,
-  tkn_prove_off, tkn_prove_on, tkn_ps,
+  tkn_parse, tkn_ph, tkn_pi, tkn_prime, tkn_prop3_off, tkn_prop3_on,
+  tkn_prop_logic, tkn_prove_off, tkn_prove_on, tkn_ps,
   tkn_real, tkn_reset, tkn_rh, tkn_root,
   tkn_si, tkn_sin, tkn_sinh, tkn_skip_errs, tkn_solve, tkn_sqrt, tkn_sum,
   tkn_ta, tkn_tan, tkn_tanh, tkn_th, tkn_tree_cmp,
@@ -726,7 +726,7 @@ inline bool yields_logic( op_type opr ){
 
 
 enum var_type {
-  vtp_none, vtp_R, vtp_Q, vtp_Z, vtp_mod, vtp_tv2, vtp_tv3, vtp_idx
+  vtp_none, vtp_R, vtp_Q, vtp_Z, vtp_P, vtp_mod, vtp_tv2, vtp_tv3, vtp_idx
 };
 unsigned mod_base = 0;
 
@@ -735,6 +735,7 @@ inline void out_type_name( var_type vt ){
   case vtp_R: out_am( "RR" ); break;
   case vtp_Q: out_am( "QQ" ); break;
   case vtp_Z: case vtp_none: out_am( "ZZ" ); break;
+  case vtp_P: out_html( "prime-number" ); break;
   case vtp_mod:
     out_am( "{" );
     if( mod_base > 1 ){ out_print( "0, " ); }
@@ -884,6 +885,8 @@ const int test_seq_Z[] = {
 const unsigned test_size_Z = 15;
 const int test_seq_Z2[] = { 0, 1, 3, -1, -3, 10, -10, 30, -30, 100, -100 };
 const unsigned test_size_Z2 = 11;
+const int test_seq_P[] = { 2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31 };
+const unsigned test_size_P = 11;
 const truth_val test_seq_tv2[] = { tv_F, tv_T };
 const truth_val test_seq_tv3[] = { tv_F, tv_T, tv_U };
 bool ls_var4 = false;   // allow fourth variable at the cost of less test
@@ -893,6 +896,7 @@ inline unsigned test_values( var_type vt ){
   switch( vt ){
   case vtp_R: case vtp_Q: return ls_var4 ? test_size_R2 : test_size_R;
   case vtp_Z: case vtp_none: return ls_var4 ? test_size_Z2 : test_size_Z;
+  case vtp_P : return test_size_P;
   case vtp_mod: return mod_base;
   case vtp_tv2: return 2;
   case vtp_tv3: return 3;
@@ -920,6 +924,7 @@ void first_test_combination( bool choose_alt = false ){
     case vtp_Z: case vtp_none:
       var_used[ ii ].value = choose_alt ? test_seq_Z2[ 0 ] : test_seq_Z[ 0 ];
       break;
+    case vtp_P: var_used[ ii ].value = test_seq_P[ 0 ]; break;
     case vtp_mod: var_used[ ii ].value = 0; break;
     case vtp_tv2: var_used[ ii ].value = test_seq_tv2[ 0 ]; break;
     case vtp_tv3: var_used[ ii ].value = test_seq_tv3[ 0 ]; break;
@@ -956,6 +961,9 @@ bool next_test_combination(
         var_seq[ ii ] %= test_size_Z;
         var_used[ ii ].value = test_seq_Z[ var_seq[ ii ] ]; break;
       }
+    case vtp_P:
+      var_seq[ ii ] %= test_size_P;
+      var_used[ ii ].value = test_seq_P[ var_seq[ ii ] ]; break;
     case vtp_mod:
       var_seq[ ii ] %= mod_base;
       var_used[ ii ].value = var_seq[ ii ]; break;
@@ -1709,6 +1717,7 @@ expression *new_expr(
     ee->type_ =
       ee->var().type == vtp_Z || ee->var().type == vtp_none ||
         ee->var().type == vtp_idx ? 0x27 :
+      ee->var().type == vtp_P ? 0x22 :
       ee->var().type == vtp_tv2 || ee->var().type == vtp_tv3 ? 0x60 :
       ee->var().type == vtp_mod ? 0xA3 : 0x3F;
     return ee;
@@ -2359,7 +2368,7 @@ bool try_fail_leq(
     if(
       xx <= -1 || xx >= 1 ||
       var_used[ ii ].type == vtp_Z || var_used[ ii ].type == vtp_none ||
-      var_used[ ii ].type == vtp_idx
+      var_used[ ii ].type == vtp_idx || var_used[ ii ].type == vtp_P
     ){ test_step[ ii ] = 1; }
     else{ test_step[ ii ] = number( 1, 10 ); }
   }
@@ -3867,7 +3876,7 @@ bool is_setting_tkn(){
     tkn_now == tkn_f_range || tkn_now == tkn_f_top_opr ||
     tkn_now == tkn_fail_text || tkn_now == tkn_forget_err ||
     tkn_now == tkn_hide_expr || tkn_now == tkn_index ||
-    tkn_now == tkn_integer || tkn_now == tkn_real ||
+    tkn_now == tkn_integer || tkn_now == tkn_prime || tkn_now == tkn_real ||
     tkn_now == tkn_next_URL || tkn_now == tkn_no_next_URL ||
     tkn_now == tkn_ok_text || tkn_now == tkn_reset ||
     tkn_now == tkn_skip_errs || tkn_now == tkn_solve
@@ -4162,10 +4171,11 @@ void parse_settings( bool new_pg = false ){
       next_URL[0] = ' '; next_URL[1] = '\0'; get_token(); matched = true;
     }
     if(
-      tkn_now == tkn_index || tkn_now == tkn_integer || tkn_now == tkn_real
+      tkn_now == tkn_index || tkn_now == tkn_integer || tkn_now == tkn_real ||
+      tkn_now == tkn_prime
     ){
       var_type vt =
-        tkn_now == tkn_integer ? vtp_Z :
+        tkn_now == tkn_integer ? vtp_Z : tkn_now == tkn_prime ? vtp_P :
         tkn_now == tkn_index ? vtp_idx : vtp_R;
       get_token();
       unsigned vv = parse_is_var_name();
@@ -4278,9 +4288,10 @@ void parse_ensure_real( unsigned vv ){
 }
 
 void parse_ensure_integer( unsigned vv ){
-  if( var_used[ vv ].type != vtp_Z && var_used[ vv ].type != vtp_idx ){
-    err_set_inp( "This variable must be of integer type" );
-  }
+  if(
+    var_used[ vv ].type != vtp_Z && var_used[ vv ].type != vtp_P &&
+    var_used[ vv ].type != vtp_idx
+  ){ err_set_inp( "This variable must be of integer type" ); }
 }
 
 void parse_ban_array( unsigned vv ){
@@ -5737,9 +5748,11 @@ void parse_draw_function_chain(){
   /* Choose the variable used on the horizontal axis. */
   unsigned vv = var_c_first;
   if( vv >= var_f_cnt ){ test_fail( err_no_var ); return; }
-  if( var_used[ vv ].type != vtp_R ){
-    err_set_inp( "The variable must be of real number type" ); return;
-  }
+  parse_ensure_real( vv );
+  if( err_mode ){ return; }
+  // if( var_used[ vv ].type != vtp_R ){
+  //   err_set_inp( "The variable must be of real number type" ); return;
+  // }
 
   if( !gs_exam ){
     /* See above the first draw_img_curve call for explanation of the
