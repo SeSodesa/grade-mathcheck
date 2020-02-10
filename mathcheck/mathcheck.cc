@@ -1,7 +1,7 @@
 #define confuse
 #define record
 #include "input_output.cc"
-copyright mathcheck_cc( "mathcheck.cc", "Antti Valmari", 20190713 );
+copyright mathcheck_cc( "mathcheck.cc", "Antti Valmari", 20200202 );
 /*
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -347,7 +347,7 @@ const char *tkn_str[] = {
   "e", "end_of_answer", "enda", "ends", "ep", "equation", "et", "exam_off",
   "exam_on",
   "f_CNF", "f_DNF", "f_ban", "f_ban_der", "f_nodes", "f_polynomial",
-  "f_range", "f_top_opr", "fail_text", "floor", "forget_errors",
+  "f_range", "f_simplify", "f_top_opr", "fail_text", "floor", "forget_errors",
   "ga",
   "help", "hide_expr",
   "index", "integer", "io",
@@ -418,8 +418,8 @@ enum tkn_type {
   tkn_e2718, tkn_eoa, tkn_enda, tkn_ends, tkn_ep, tkn_equation, tkn_et,
   tkn_exam_off, tkn_exam_on,
   tkn_f_CNF, tkn_f_DNF, tkn_f_ban, tkn_f_ban_der, tkn_f_nodes,
-  tkn_f_polynomial, tkn_f_range, tkn_f_top_opr, tkn_fail_text, tkn_floor,
-  tkn_forget_err,
+  tkn_f_polynomial, tkn_f_range, tkn_f_simplify, tkn_f_top_opr, tkn_fail_text,
+  tkn_floor, tkn_forget_err,
   tkn_ga,
   tkn_help, tkn_hide_expr,
   tkn_index, tkn_integer, tkn_io,
@@ -1122,6 +1122,7 @@ bool
   ls_f_CNF = false,       // final expression must be in CNF
   ls_f_DNF = false,       // final expression must be in DNF
   ls_f_polynomial = false,  // final expression must be in polynomial form
+  ls_f_simplify = false,  // final expression must have been simplified
   ls_f_range = false;     // f.e. must not contain constants outside mod_base
 unsigned
   ls_b_nodes = 0,         // > 0: praise complexity of the final expression
@@ -1611,6 +1612,26 @@ public:
       if( left_ ){ return left_->is_polynomial() && right_->is_pol_term(); }
       else{ return right_->is_pol_term(); }
     }else{ return is_pol_term(); }
+  }
+
+  /* Reveals whether the expression is in simplified form. */
+  bool raw_equal( expression *ee ){
+std::cout << "Verrataan " << this << " ja " << ee << '\n';
+std::cout << opr_ << " " << ee->opr_ << "\n";
+    if( !ee || opr_ != ee->opr_ || !( val_ == ee->val_ ) ){ return false; }
+std::cout << "alku selvitty\n";
+    if( left_ != ee->left_ ){
+      if( !left_ || !left_->raw_equal( ee->left_ ) ){ return false; }
+    }
+std::cout << "vasen selvitty\n";
+    if( right_ != ee->right_ ){
+      if( !right_ || !right_->raw_equal( ee->right_ ) ){ return false; }
+    }
+std::cout << "oikea selvitty\n";
+    return true;
+  }
+  bool is_simplified(){
+    return raw_equal( simplify( this ) );
   }
 
   /* Reveals whether the constants in the expression are in the allowed
@@ -3873,10 +3894,11 @@ bool is_setting_tkn(){
     tkn_now == tkn_f_CNF || tkn_now == tkn_f_DNF ||
     tkn_now == tkn_f_ban || tkn_now == tkn_f_ban_der ||
     tkn_now == tkn_f_nodes || tkn_now == tkn_f_polynomial ||
-    tkn_now == tkn_f_range || tkn_now == tkn_f_top_opr ||
-    tkn_now == tkn_fail_text || tkn_now == tkn_forget_err ||
-    tkn_now == tkn_hide_expr || tkn_now == tkn_index ||
-    tkn_now == tkn_integer || tkn_now == tkn_prime || tkn_now == tkn_real ||
+    tkn_now == tkn_f_range || tkn_now == tkn_f_simplify ||
+    tkn_now == tkn_f_top_opr || tkn_now == tkn_fail_text ||
+    tkn_now == tkn_forget_err || tkn_now == tkn_hide_expr ||
+    tkn_now == tkn_index || tkn_now == tkn_integer ||
+    tkn_now == tkn_prime || tkn_now == tkn_real ||
     tkn_now == tkn_next_URL || tkn_now == tkn_no_next_URL ||
     tkn_now == tkn_ok_text || tkn_now == tkn_reset ||
     tkn_now == tkn_skip_errs || tkn_now == tkn_solve
@@ -4088,6 +4110,12 @@ void parse_settings( bool new_pg = false ){
         pgh_msg( "The final expression must be in polynomial form" );
       }
       ls_f_polynomial = true; get_token(); matched = true;
+    }
+    if( tkn_now == tkn_f_simplify ){
+      if( gs_verbose ){
+        pgh_msg( "The final expression must be in simplified form" );
+      }
+      ls_f_simplify = true; get_token(); matched = true;
     }
     if( tkn_now == tkn_f_range ){
       if( gs_verbose ){
@@ -5258,9 +5286,7 @@ std::vector< expression * > sol_step; // solution steps
 
 /* Finds explicit roots from within an expression and checks that they satisfy
   the original equation. */
-bool root_is_explicit = true;   // the checked expr is an explicit root
 bool check_expl_root( expression *ee ){
-  root_is_explicit = true;
 
   /* Navigate between alternative answers. */
   if( ee->opr() == op_or ){
@@ -5299,7 +5325,6 @@ bool check_expl_root( expression *ee ){
 
   }
 
-  root_is_explicit = false;
   return true;
 }
 
@@ -5317,6 +5342,7 @@ bool return_is_explicit( expression *ee ){
 
 /* By trying the teacher-given and student-found values, check that the
   equation is correctly solved. */
+bool root_is_explicit = true;   // the checked expr is an explicit root
 void check_equation( expression *ee, bool been_up ){
   for( unsigned ii = 0; ii < roots_val.size(); ++ii ){
     var_used[ 0 ].value = roots_val[ ii ];
@@ -5325,7 +5351,7 @@ void check_equation( expression *ee, bool been_up ){
   sol_step.push_back( ee );
   if( !been_up ){
     if( ee == expr_F ){ root_is_explicit = true; }
-    else{ check_expl_root( ee ); }
+    else{ root_is_explicit = check_expl_root( ee ); }
   }
 }
 
@@ -5826,7 +5852,7 @@ void parse_logic_chain( pm_type pm_now ){
       /* Check an equation and record whether it explicitly shows roots. */
       if( pb_mode == pb_equation ){
         if( !gs_exam ){ check_equation( now_expr, been_up ); }
-        else if( !been_up ){
+        if( !been_up ){
           if( now_expr == expr_F ){ root_is_explicit = true; }
           else{ root_is_explicit = return_is_explicit( now_expr ); }
         }
@@ -6504,6 +6530,11 @@ int main(){
             "polynomial form.\n" );
           ++err_cnt;
         }
+        if( ls_f_simplify && !now_expr->is_simplified() ){
+          out_html( "\n<p class=warn>The final expression must be in "
+            "simplified form.\n" );
+          ++err_cnt;
+        }
         if( ls_f_range && !now_expr->is_range() ){
           out_html( "\n<p class=warn>The final expression must not contain "
             "constants outside 0, &hellip;, " );
@@ -6589,7 +6620,7 @@ int main(){
 
     /* Reset chain-local settings. */
     ls_allow_comp = ls_ban_comp = ls_hide_expr = ls_var4 = ls_f_CNF =
-    ls_f_DNF = ls_f_polynomial = ls_f_range = false;
+    ls_f_DNF = ls_f_polynomial = ls_f_simplify = ls_f_range = false;
     ls_b_nodes = ls_f_nodes = ls_solve = ls_f_top_var = ls_f_ban_cnt = 0;
     ls_f_top_opr = op_err;
 

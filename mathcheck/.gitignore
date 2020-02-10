@@ -1,0 +1,18 @@
+# Ignore everything
+*
+
+# Allow specific files
+!.gitignore
+
+!gpl.txt
+
+!CFG.cc
+!decomment.cc
+!draw.cc
+!draw_font_def.cc
+!input_output.cc
+!instructions.cc
+!links.cc
+!make_problem.cc
+!mathcheck.cc
+!number.cc
